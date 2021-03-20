@@ -35,7 +35,7 @@ import {
   getPublicRootInstance,
   findHostInstance,
   findHostInstanceWithWarning,
-} from 'react-reconciler/inline.dom';
+} from '../../../react-reconciler/inline.dom';
 import {createPortal as createPortalImpl} from 'shared/ReactPortal';
 import {canUseDOM} from 'shared/ExecutionEnvironment';
 import {setBatchingImplementation} from 'events/ReactGenericBatching';

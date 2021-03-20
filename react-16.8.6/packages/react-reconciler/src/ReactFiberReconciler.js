@@ -112,6 +112,7 @@ function getContextForSubtree(
   return parentContext;
 }
 
+// TODO: 重点
 function scheduleRootUpdate(
   current: Fiber,
   element: ReactNodeList,
