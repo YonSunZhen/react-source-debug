@@ -117,10 +117,11 @@ export function createFiberRoot(
   let root;
   if (enableSchedulerTracing) {
     root = ({
-      current: uninitializedFiber,
-      containerInfo: containerInfo,
-      pendingChildren: null,
+      current: uninitializedFiber, // 当前应用对应的Fiber对象 是Root Fiber
+      containerInfo: containerInfo, // 应用挂载的节点
+      pendingChildren: null, // 只有在持久更新中会用到，也就是不支持增量更新的平台，react-dom不会用到
 
+      // 各种时间 用来标记任务的优先级
       earliestPendingTime: NoWork,
       latestPendingTime: NoWork,
       earliestSuspendedTime: NoWork,
@@ -129,18 +130,18 @@ export function createFiberRoot(
 
       pingCache: null,
 
-      didError: false,
+      didError: false, // 在 renderRoot 出现无法处理的错误时会被设置为true
 
-      pendingCommitExpirationTime: NoWork,
-      finishedWork: null,
-      timeoutHandle: noTimeout,
-      context: null,
+      pendingCommitExpirationTime: NoWork, // 正在等待提交的任务的expirationTime
+      finishedWork: null, // 在commit阶段只会处理这个值对应的任务
+      timeoutHandle: noTimeout, // 在任务被挂起的时候通过setTimeout设置的返回内容 用来下一次如果有新的任务挂起时清理还没触发的timeout
+      context: null, // 顶层context对象 只有主动调用renderSubtreeIntoContainer时才会有用
       pendingContext: null,
-      hydrate,
-      nextExpirationTimeToWorkOn: NoWork,
-      expirationTime: NoWork,
+      hydrate, // 用来确定第一次渲染的时候是否需要融合
+      nextExpirationTimeToWorkOn: NoWork, // 当前root上剩余的过期时间
+      expirationTime: NoWork, // 当前更新对应的过期时间
       firstBatch: null,
-      nextScheduledRoot: null,
+      nextScheduledRoot: null, // root之间关联的链表结构
 
       interactionThreadID: unstable_getThreadID(),
       memoizedInteractions: new Set(),
