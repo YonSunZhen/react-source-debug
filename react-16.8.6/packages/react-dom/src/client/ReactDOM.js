@@ -7,13 +7,13 @@
  * @flow
  */
 
-import type {ReactNodeList} from 'shared/ReactTypes';
+import {ReactNodeList} from '../../../shared/ReactTypes';
 // TODO: This type is shared between the reconciler and ReactDOM, but will
 // eventually be lifted out to the renderer.
-import type {
+import {
   FiberRoot,
   Batch as FiberRootBatch,
-} from 'react-reconciler/src/ReactFiberRoot';
+} from '../../../react-reconciler/src/ReactFiberRoot';
 
 import '../shared/checkReact';
 import './ReactDOMClientInjection';
@@ -36,8 +36,8 @@ import {
   findHostInstance,
   findHostInstanceWithWarning,
 } from '../../../react-reconciler/inline.dom';
-import {createPortal as createPortalImpl} from 'shared/ReactPortal';
-import {canUseDOM} from 'shared/ExecutionEnvironment';
+import {createPortal as createPortalImpl} from '../../../shared/ReactPortal';
+import {canUseDOM} from '../../../shared/ExecutionEnvironment';
 import {setBatchingImplementation} from 'events/ReactGenericBatching';
 import {
   setRestoreImplementation,
@@ -53,14 +53,14 @@ import {
   accumulateTwoPhaseDispatches,
   accumulateDirectDispatches,
 } from 'events/EventPropagators';
-import {has as hasInstance} from 'shared/ReactInstanceMap';
-import ReactVersion from 'shared/ReactVersion';
-import ReactSharedInternals from 'shared/ReactSharedInternals';
-import getComponentName from 'shared/getComponentName';
-import invariant from 'shared/invariant';
-import lowPriorityWarning from 'shared/lowPriorityWarning';
-import warningWithoutStack from 'shared/warningWithoutStack';
-import {enableStableConcurrentModeAPIs} from 'shared/ReactFeatureFlags';
+import {has as hasInstance} from '../../../shared/ReactInstanceMap';
+import ReactVersion from '../../../shared/ReactVersion';
+import ReactSharedInternals from '../../../shared/ReactSharedInternals';
+import getComponentName from '../../../shared/getComponentName';
+import invariant from '../../../shared/invariant';
+import lowPriorityWarning from '../../../shared/lowPriorityWarning';
+import warningWithoutStack from '../../../shared/warningWithoutStack';
+import {enableStableConcurrentModeAPIs} from '../../../shared/ReactFeatureFlags';
 
 import {
   getInstanceFromNode,
@@ -361,15 +361,17 @@ ReactWork.prototype._onCommit = function(): void {
     callback();
   }
 };
-
+// #1_1_1_1
 function ReactRoot(
   container: DOMContainer,
   isConcurrent: boolean,
   hydrate: boolean,
 ) {
+  // #1_1_1_1_1 #2
   const root = createContainer(container, isConcurrent, hydrate);
   this._internalRoot = root;
 }
+// #1_1_2
 ReactRoot.prototype.render = function(
   children: ReactNodeList,
   callback: ?() => mixed,
@@ -383,6 +385,7 @@ ReactRoot.prototype.render = function(
   if (callback !== null) {
     work.then(callback);
   }
+  // #1_1_2_1
   updateContainer(children, root, null, work._onCommit);
   return work;
 };
@@ -491,7 +494,7 @@ setBatchingImplementation(
 );
 
 let warnedAboutHydrateAPI = false;
-
+// #1_1_1
 function legacyCreateRootFromDOMContainer(
   container: DOMContainer,
   forceHydrate: boolean,
@@ -518,6 +521,7 @@ function legacyCreateRootFromDOMContainer(
           );
         }
       }
+      // 删除所有子节点
       container.removeChild(rootSibling);
     }
   }
@@ -534,9 +538,10 @@ function legacyCreateRootFromDOMContainer(
   }
   // Legacy roots are not async by default.
   const isConcurrent = false;
+  // #1_1_1_1
   return new ReactRoot(container, isConcurrent, shouldHydrate);
 }
-
+// #1_1
 function legacyRenderSubtreeIntoContainer(
   parentComponent: ?React$Component<any, any>,
   children: ReactNodeList,
@@ -552,6 +557,7 @@ function legacyRenderSubtreeIntoContainer(
   // member of intersection type." Whyyyyyy.
   let root: Root = (container._reactRootContainer: any);
   if (!root) {
+    // #1_1_1
     // Initial mount
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
@@ -573,6 +579,7 @@ function legacyRenderSubtreeIntoContainer(
           callback,
         );
       } else {
+        // #1_1_2
         root.render(children, callback);
       }
     });
@@ -669,7 +676,7 @@ const ReactDOM: Object = {
       callback,
     );
   },
-
+  // #1
   render(
     element: React$Element<any>,
     container: DOMContainer,
@@ -688,6 +695,7 @@ const ReactDOM: Object = {
         enableStableConcurrentModeAPIs ? 'createRoot' : 'unstable_createRoot',
       );
     }
+    // #1_1
     return legacyRenderSubtreeIntoContainer(
       null,
       element,

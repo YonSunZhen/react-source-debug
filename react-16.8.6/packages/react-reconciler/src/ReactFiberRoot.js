@@ -104,7 +104,7 @@ export type FiberRoot = {
   ...BaseFiberRootProperties,
   ...ProfilingOnlyFiberRootProperties,
 };
-
+// #2_1
 export function createFiberRoot(
   containerInfo: any,
   isConcurrent: boolean,

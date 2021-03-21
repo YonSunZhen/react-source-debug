@@ -112,7 +112,7 @@ function getContextForSubtree(
   return parentContext;
 }
 
-// TODO: 重点
+// #1_1_2_1_1_1
 function scheduleRootUpdate(
   current: Fiber,
   element: ReactNodeList,
@@ -159,7 +159,7 @@ function scheduleRootUpdate(
 
   return expirationTime;
 }
-
+// #1_1_2_1_1
 export function updateContainerAtExpirationTime(
   element: ReactNodeList,
   container: OpaqueRoot,
@@ -188,7 +188,7 @@ export function updateContainerAtExpirationTime(
   } else {
     container.pendingContext = context;
   }
-
+  // #1_1_2_1_1_1
   return scheduleRootUpdate(current, element, expirationTime, callback);
 }
 
@@ -272,15 +272,16 @@ function findHostInstanceWithWarning(
   }
   return findHostInstance(component);
 }
-
+// #1_1_1_1_1 #2
 export function createContainer(
   containerInfo: Container,
   isConcurrent: boolean,
   hydrate: boolean,
 ): OpaqueRoot {
+  // #2_1
   return createFiberRoot(containerInfo, isConcurrent, hydrate);
 }
-
+// #1_1_2_1
 export function updateContainer(
   element: ReactNodeList,
   container: OpaqueRoot,
@@ -290,6 +291,7 @@ export function updateContainer(
   const current = container.current;
   const currentTime = requestCurrentTime();
   const expirationTime = computeExpirationForFiber(currentTime, current);
+  // #1_1_2_1_1
   return updateContainerAtExpirationTime(
     element,
     container,
