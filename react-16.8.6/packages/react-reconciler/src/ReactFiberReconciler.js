@@ -136,7 +136,7 @@ function scheduleRootUpdate(
       );
     }
   }
-
+  // #1_1_2_1_1_1_1 #3
   const update = createUpdate(expirationTime);
   // Caution: React DevTools currently depends on this property
   // being called "element".
@@ -154,6 +154,7 @@ function scheduleRootUpdate(
   }
 
   flushPassiveEffects();
+  // #4
   enqueueUpdate(current, update);
   scheduleWork(current, expirationTime);
 

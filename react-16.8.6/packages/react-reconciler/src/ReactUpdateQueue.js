@@ -152,7 +152,7 @@ if (__DEV__) {
     currentlyProcessingQueue = null;
   };
 }
-
+// #4_1
 export function createUpdateQueue<State>(baseState: State): UpdateQueue<State> {
   const queue: UpdateQueue<State> = {
     baseState,
@@ -189,17 +189,17 @@ function cloneUpdateQueue<State>(
   };
   return queue;
 }
-
+// #3
 export function createUpdate(expirationTime: ExpirationTime): Update<*> {
   return {
-    expirationTime: expirationTime,
+    expirationTime: expirationTime, // 更新的过期时间
 
-    tag: UpdateState,
-    payload: null,
-    callback: null,
+    tag: UpdateState, // 指定更新的类型 0|1|2|3
+    payload: null, // 更新内容，比如setState接收的第一个参数
+    callback: null, // 对应的回调 setState render都有
 
-    next: null,
-    nextEffect: null,
+    next: null, // 指向下一个更新
+    nextEffect: null, // 指向下一个side effect
   };
 }
 
@@ -216,7 +216,7 @@ function appendUpdateToQueue<State>(
     queue.lastUpdate = update;
   }
 }
-
+// #4
 export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
   // Update queues are created lazily.
   const alternate = fiber.alternate;
@@ -227,6 +227,7 @@ export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
     queue1 = fiber.updateQueue;
     queue2 = null;
     if (queue1 === null) {
+      // #4_1
       queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
     }
   } else {
