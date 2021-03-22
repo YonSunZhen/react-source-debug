@@ -1740,7 +1740,7 @@ function retryTimedOutBoundary(boundaryFiber: Fiber, thenable: Thenable) {
     }
   }
 }
-
+// #7_1 向上寻找 找到对应的FiberRoot的情况
 function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   recordScheduleUpdate();
 
@@ -1847,8 +1847,9 @@ export function warnIfNotCurrentlyBatchingInDev(fiber: Fiber): void {
     }
   }
 }
-
+// #7
 function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
+  // #7_1
   const root = scheduleWorkToRoot(fiber, expirationTime);
   if (root === null) {
     if (__DEV__) {
@@ -2069,7 +2070,7 @@ function requestCurrentTime() {
   ) {
     // If there's no pending work, or if the pending work is offscreen, we can
     // read the current time without risk of tearing.
-    recomputeCurrentRendererTime();
+    recomputeCurrentRendererTime(); // currentRendererTime
     currentSchedulerTime = currentRendererTime;
     return currentSchedulerTime;
   }

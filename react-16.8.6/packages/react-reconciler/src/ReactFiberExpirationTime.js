@@ -21,7 +21,7 @@ const MAGIC_NUMBER_OFFSET = MAX_SIGNED_31_BIT_INT - 1;
 // 1 unit of expiration time represents 10ms.
 export function msToExpirationTime(ms: number): ExpirationTime {
   // Always add an offset so that we don't clash with the magic number for NoWork.
-  return MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0);
+  return MAGIC_NUMBER_OFFSET - ((ms / UNIT_SIZE) | 0); // 不大一样
 }
 
 export function expirationTimeToMs(expirationTime: ExpirationTime): number {
@@ -31,7 +31,7 @@ export function expirationTimeToMs(expirationTime: ExpirationTime): number {
 function ceiling(num: number, precision: number): number {
   return (((num / precision) | 0) + 1) * precision;
 }
-
+// #5_1
 function computeExpirationBucket(
   currentTime,
   expirationInMs,

@@ -156,6 +156,7 @@ function scheduleRootUpdate(
   flushPassiveEffects();
   // #4
   enqueueUpdate(current, update);
+  // #7
   scheduleWork(current, expirationTime);
 
   return expirationTime;
@@ -290,7 +291,8 @@ export function updateContainer(
   callback: ?Function,
 ): ExpirationTime {
   const current = container.current;
-  const currentTime = requestCurrentTime();
+  const currentTime = requestCurrentTime(); // currentSchedulerTime
+  // #5
   const expirationTime = computeExpirationForFiber(currentTime, current);
   // #1_1_2_1_1
   return updateContainerAtExpirationTime(
