@@ -372,8 +372,9 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
     throw originalReplayError;
   };
 }
-
+// #7_1_1
 function resetStack() {
+  // ???
   if (nextUnitOfWork !== null) {
     let interruptedWork = nextUnitOfWork.return;
     while (interruptedWork !== null) {
@@ -1752,15 +1753,15 @@ function scheduleWorkToRoot(fiber: Fiber, expirationTime): FiberRoot | null {
   }
 
   // Update the source fiber's expiration time
-  if (fiber.expirationTime < expirationTime) {
-    fiber.expirationTime = expirationTime;
+  if (fiber.expirationTime < expirationTime) { // 不大一样
+    fiber.expirationTime = expirationTime; // expirationTime越大 优先级越低 这里是将优先级降低了
   }
-  let alternate = fiber.alternate;
+  let alternate = fiber.alternate; // 在渲染完成之后他们会交换位置
   if (alternate !== null && alternate.expirationTime < expirationTime) {
     alternate.expirationTime = expirationTime;
   }
   // Walk the parent path to the root and update the child expiration time.
-  let node = fiber.return;
+  let node = fiber.return; // 返回节点的父级
   let root = null;
   if (node === null && fiber.tag === HostRoot) {
     root = fiber.stateNode;
@@ -1875,7 +1876,8 @@ function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
   ) {
     // This is an interruption. (Used for performance tracking.)
     interruptedBy = fiber;
-    resetStack();
+    // #7_1_1
+    resetStack(); // 优先执行高优先级的任务
   }
   markPendingPriorityLevel(root, expirationTime);
   if (
@@ -1887,6 +1889,7 @@ function scheduleWork(fiber: Fiber, expirationTime: ExpirationTime) {
     nextRoot !== root
   ) {
     const rootExpirationTime = root.expirationTime;
+    // #8
     requestWork(root, rootExpirationTime);
   }
   if (nestedUpdateCount > NESTED_UPDATE_LIMIT) {
@@ -2081,10 +2084,11 @@ function requestCurrentTime() {
   // time will be updated.
   return currentSchedulerTime;
 }
-
+// #8
 // requestWork is called by the scheduler whenever a root receives an update.
 // It's up to the renderer to call renderRoot at some point in the future.
 function requestWork(root: FiberRoot, expirationTime: ExpirationTime) {
+  // #8_1
   addRootToSchedule(root, expirationTime);
   if (isRendering) {
     // Prevent reentrancy. Remaining work will be scheduled at the end of
@@ -2111,7 +2115,7 @@ function requestWork(root: FiberRoot, expirationTime: ExpirationTime) {
     scheduleCallbackWithExpirationTime(root, expirationTime);
   }
 }
-
+// #8_1
 function addRootToSchedule(root: FiberRoot, expirationTime: ExpirationTime) {
   // Add the root to the schedule.
   // Check if this root is already part of the schedule.
