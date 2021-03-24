@@ -7,15 +7,16 @@ export default class BatchUpdateDemo extends React.Component {
   }
 
   handleClick = () => {
+    // setTimeout 会导致应用整体的性能下降
     // setTimeout(() => {
     //   this.countNumber();
     // }, 0)
 
-    setTimeout(() => {
-      batchedUpdates(() => this.countNumber())
-    });
+    // setTimeout(() => {
+    //   batchedUpdates(() => this.countNumber())
+    // });
 
-    // this.countNumber();
+    this.countNumber();
   }
 
   // 函数中多个setState会被合并

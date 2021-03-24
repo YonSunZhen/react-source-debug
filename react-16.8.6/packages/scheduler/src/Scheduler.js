@@ -313,7 +313,7 @@ function unstable_wrapCallback(callback) {
     }
   };
 }
-
+// #10 react scheduler
 function unstable_scheduleCallback(callback, deprecated_options) {
   var startTime =
     currentEventStartTime !== -1 ? currentEventStartTime : getCurrentTime();

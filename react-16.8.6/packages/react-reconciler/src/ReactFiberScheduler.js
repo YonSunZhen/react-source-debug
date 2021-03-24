@@ -1953,7 +1953,7 @@ function recomputeCurrentRendererTime() {
   const currentTimeMs = now() - originalStartTimeMs;
   currentRendererTime = msToExpirationTime(currentTimeMs);
 }
-
+// #8_2
 function scheduleCallbackWithExpirationTime(
   root: FiberRoot,
   expirationTime: ExpirationTime,
@@ -1979,6 +1979,7 @@ function scheduleCallbackWithExpirationTime(
   const currentMs = now() - originalStartTimeMs;
   const expirationTimeMs = expirationTimeToMs(expirationTime);
   const timeout = expirationTimeMs - currentMs;
+  // #10
   callbackID = scheduleDeferredCallback(performAsyncWork, {timeout});
 }
 
@@ -2112,6 +2113,7 @@ function requestWork(root: FiberRoot, expirationTime: ExpirationTime) {
   if (expirationTime === Sync) {
     performSyncWork();
   } else {
+    // #8_2
     scheduleCallbackWithExpirationTime(root, expirationTime);
   }
 }
@@ -2486,6 +2488,7 @@ function onUncaughtError(error: mixed) {
   }
 }
 
+// #9
 // TODO: Batching should be implemented at the renderer level, not inside
 // the reconciler.
 function batchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
