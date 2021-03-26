@@ -49,7 +49,7 @@ var isHostCallbackScheduled = false;
 
 var hasNativePerformanceNow =
   typeof performance === 'object' && typeof performance.now === 'function';
-
+// #10_1
 function ensureHostCallbackIsScheduled() {
   if (isExecutingCallback) {
     // Don't schedule work yet; wait until the next time we yield.
@@ -63,9 +63,10 @@ function ensureHostCallbackIsScheduled() {
     // Cancel the existing host callback.
     cancelHostCallback();
   }
+  // #10_1_1
   requestHostCallback(flushWork, expirationTime);
 }
-
+// #10_1_1_2_1_1_1
 function flushFirstCallback() {
   var flushedNode = firstCallbackNode;
 
@@ -176,7 +177,7 @@ function flushImmediateWork() {
     }
   }
 }
-
+// #10_1_1_2_1_1
 function flushWork(didTimeout) {
   // Exit right away if we're currently paused
 
@@ -201,6 +202,7 @@ function flushWork(didTimeout) {
         var currentTime = getCurrentTime();
         if (firstCallbackNode.expirationTime <= currentTime) {
           do {
+            // #10_1_1_2_1_1_1
             flushFirstCallback();
           } while (
             firstCallbackNode !== null &&
@@ -227,7 +229,7 @@ function flushWork(didTimeout) {
     currentDidTimeout = previousDidTimeout;
     if (firstCallbackNode !== null) {
       // There's still work remaining. Request another callback.
-      ensureHostCallbackIsScheduled();
+      ensureHostCallbackIsScheduled(); // 为什么这里需要执行这个？
     } else {
       isHostCallbackScheduled = false;
     }
@@ -360,6 +362,7 @@ function unstable_scheduleCallback(callback, deprecated_options) {
   if (firstCallbackNode === null) {
     // This is the first callback in the list.
     firstCallbackNode = newNode.next = newNode.previous = newNode;
+    // #10_1
     ensureHostCallbackIsScheduled();
   } else {
     var next = null;
@@ -373,6 +376,7 @@ function unstable_scheduleCallback(callback, deprecated_options) {
       node = node.next;
     } while (node !== firstCallbackNode);
 
+    // 形成一个循环链表
     if (next === null) {
       // No callback with a later expiration was found, which means the new
       // callback has the latest expiration in the list.
@@ -433,7 +437,7 @@ function unstable_cancelCallback(callbackNode) {
 function unstable_getCurrentPriorityLevel() {
   return currentPriorityLevel;
 }
-
+// #shouldYield
 function unstable_shouldYield() {
   return (
     !currentDidTimeout &&
@@ -483,6 +487,7 @@ var getCurrentTime;
 var ANIMATION_FRAME_TIMEOUT = 100;
 var rAFID;
 var rAFTimeoutID;
+// #10_1_1_1
 var requestAnimationFrameWithTimeout = function(callback) {
   // schedule rAF and also a setTimeout
   rAFID = localRequestAnimationFrame(function(timestamp) {
@@ -601,6 +606,7 @@ if (globalValue && globalValue._schedMock) {
   // We use the postMessage trick to defer idle work until after the repaint.
   var channel = new MessageChannel();
   var port = channel.port2;
+  // #10_1_1_2_1
   channel.port1.onmessage = function(event) {
     isMessageEventScheduled = false;
 
@@ -636,13 +642,14 @@ if (globalValue && globalValue._schedMock) {
     if (prevScheduledCallback !== null) {
       isFlushingHostCallback = true;
       try {
+        // #10_1_1_2_1_1
         prevScheduledCallback(didTimeout);
       } finally {
         isFlushingHostCallback = false;
       }
     }
   };
-
+  // #10_1_1_2
   var animationTick = function(rafTime) {
     if (scheduledHostCallback !== null) {
       // Eagerly schedule the next animation callback at the beginning of the
@@ -660,6 +667,7 @@ if (globalValue && globalValue._schedMock) {
       return;
     }
 
+    // 用来计算这个方法到下一帧还有多少时间
     var nextFrameTime = rafTime - frameDeadline + activeFrameTime;
     if (
       nextFrameTime < activeFrameTime &&
@@ -685,10 +693,11 @@ if (globalValue && globalValue._schedMock) {
     frameDeadline = rafTime + activeFrameTime;
     if (!isMessageEventScheduled) {
       isMessageEventScheduled = true;
+      // #10_1_1_2_1
       port.postMessage(undefined);
     }
   };
-
+  // #10_1_1
   requestHostCallback = function(callback, absoluteTimeout) {
     scheduledHostCallback = callback;
     timeoutTime = absoluteTimeout;
@@ -701,6 +710,7 @@ if (globalValue && globalValue._schedMock) {
       // might want to still have setTimeout trigger rIC as a backup to ensure
       // that we keep performing work.
       isAnimationFrameScheduled = true;
+      // #10_1_1_1 #10_1_1_2
       requestAnimationFrameWithTimeout(animationTick);
     }
   };

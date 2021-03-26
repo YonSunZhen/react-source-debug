@@ -1144,7 +1144,7 @@ function completeUnitOfWork(workInProgress: Fiber): Fiber | null {
   // eslint-disable-next-line no-unreachable
   return null;
 }
-
+// #12_1_1 循环每个节点 然后更新每个节点
 function performUnitOfWork(workInProgress: Fiber): Fiber | null {
   // The current, flushed, state of this fiber is the alternate.
   // Ideally nothing should rely on this, but relying on it here
@@ -1206,11 +1206,12 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
 
   return next;
 }
-
+// #12_1
 function workLoop(isYieldy) {
   if (!isYieldy) {
     // Flush work without yielding
     while (nextUnitOfWork !== null) {
+      // #12_1_1
       nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
     }
   } else {
@@ -1220,7 +1221,7 @@ function workLoop(isYieldy) {
     }
   }
 }
-
+// #12
 function renderRoot(root: FiberRoot, isYieldy: boolean): void {
   invariant(
     !isWorking,
@@ -1312,6 +1313,7 @@ function renderRoot(root: FiberRoot, isYieldy: boolean): void {
 
   do {
     try {
+      // #12_1
       workLoop(isYieldy);
     } catch (thrownValue) {
       resetContextDependences();
@@ -2141,7 +2143,7 @@ function addRootToSchedule(root: FiberRoot, expirationTime: ExpirationTime) {
     }
   }
 }
-
+// #11_1_1
 function findHighestPriorityRoot() {
   let highestPriorityWork = NoWork;
   let highestPriorityRoot = null;
@@ -2221,7 +2223,7 @@ function shouldYieldToRenderer() {
   }
   return false;
 }
-
+// #11
 function performAsyncWork() {
   try {
     if (!shouldYieldToRenderer()) {
@@ -2240,6 +2242,7 @@ function performAsyncWork() {
         } while (root !== firstScheduledRoot);
       }
     }
+    // #11_1
     performWork(NoWork, true);
   } finally {
     didYield = false;
@@ -2249,8 +2252,9 @@ function performAsyncWork() {
 function performSyncWork() {
   performWork(Sync, false);
 }
-
+// #11_1
 function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
+  // #11_1_1
   // Keep working on roots until there's no more work, or until there's a higher
   // priority event.
   findHighestPriorityRoot();
@@ -2271,6 +2275,7 @@ function performWork(minExpirationTime: ExpirationTime, isYieldy: boolean) {
       minExpirationTime <= nextFlushedExpirationTime &&
       !(didYield && currentRendererTime > nextFlushedExpirationTime)
     ) {
+      // #11_1_2
       performWorkOnRoot(
         nextFlushedRoot,
         nextFlushedExpirationTime,
@@ -2354,7 +2359,7 @@ function finishRendering() {
     throw error;
   }
 }
-
+// #11_1_2
 function performWorkOnRoot(
   root: FiberRoot,
   expirationTime: ExpirationTime,
