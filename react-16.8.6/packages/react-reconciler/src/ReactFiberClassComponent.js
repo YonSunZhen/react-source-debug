@@ -19,7 +19,7 @@ import {
 } from 'shared/ReactFeatureFlags';
 import ReactStrictModeWarnings from './ReactStrictModeWarnings';
 import {isMounted} from 'react-reconciler/reflection';
-import {get as getInstance, set as setInstance} from 'shared/ReactInstanceMap';
+import {get as getInstance, set as setInstance} from '../../shared/ReactInstanceMap';
 import shallowEqual from 'shared/shallowEqual';
 import getComponentName from 'shared/getComponentName';
 import invariant from 'shared/invariant';
@@ -492,7 +492,7 @@ function checkClassInstance(workInProgress: Fiber, ctor: any, newProps: any) {
     }
   }
 }
-
+// #17_1_1
 function adoptClassInstance(workInProgress: Fiber, instance: any): void {
   instance.updater = classComponentUpdater;
   workInProgress.stateNode = instance;
@@ -502,7 +502,7 @@ function adoptClassInstance(workInProgress: Fiber, instance: any): void {
     instance._reactInternalInstance = fakeInternalInstance;
   }
 }
-
+// #17_1
 function constructClassInstance(
   workInProgress: Fiber,
   ctor: any,
@@ -585,6 +585,7 @@ function constructClassInstance(
     instance.state !== null && instance.state !== undefined
       ? instance.state
       : null);
+  // #17_1_1
   adoptClassInstance(workInProgress, instance);
 
   if (__DEV__) {
@@ -743,6 +744,7 @@ function callComponentWillReceiveProps(
   }
 }
 
+// #17_2
 // Invokes the mount life-cycles on a previously never rendered instance.
 function mountClassInstance(
   workInProgress: Fiber,
@@ -804,6 +806,7 @@ function mountClassInstance(
 
   let updateQueue = workInProgress.updateQueue;
   if (updateQueue !== null) {
+    // #17_2_1
     processUpdateQueue(
       workInProgress,
       updateQueue,
@@ -853,7 +856,7 @@ function mountClassInstance(
     workInProgress.effectTag |= Update;
   }
 }
-
+// #17_3
 function resumeMountClassInstance(
   workInProgress: Fiber,
   ctor: any,

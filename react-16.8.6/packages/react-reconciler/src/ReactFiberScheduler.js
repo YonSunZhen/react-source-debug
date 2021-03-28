@@ -1179,6 +1179,7 @@ function performUnitOfWork(workInProgress: Fiber): Fiber | null {
       stopProfilerTimerIfRunningAndRecordDelta(workInProgress, true);
     }
   } else {
+    // #13
     next = beginWork(current, workInProgress, nextRenderExpirationTime);
     workInProgress.memoizedProps = workInProgress.pendingProps;
   }

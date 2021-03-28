@@ -147,7 +147,7 @@ if (__DEV__) {
   didWarnAboutFunctionRefs = {};
   didWarnAboutReassigningProps = false;
 }
-
+// #15
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -155,6 +155,7 @@ export function reconcileChildren(
   renderExpirationTime: ExpirationTime,
 ) {
   if (current === null) {
+    // #15_1
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
     // we will add them all to the child before it gets rendered. That means
@@ -180,7 +181,7 @@ export function reconcileChildren(
     );
   }
 }
-
+// #17_4_1
 function forceUnmountCurrentAndReconcile(
   current: Fiber,
   workInProgress: Fiber,
@@ -531,7 +532,7 @@ function markRef(current: Fiber | null, workInProgress: Fiber) {
     workInProgress.effectTag |= Ref;
   }
 }
-
+// #14
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -591,6 +592,7 @@ function updateFunctionComponent(
     }
     setCurrentPhase(null);
   } else {
+    // function组件也可以用context 意料之外
     nextChildren = renderWithHooks(
       current,
       workInProgress,
@@ -612,6 +614,7 @@ function updateFunctionComponent(
 
   // React DevTools reads this flag.
   workInProgress.effectTag |= PerformedWork;
+  // #15
   reconcileChildren(
     current,
     workInProgress,
@@ -620,7 +623,7 @@ function updateFunctionComponent(
   );
   return workInProgress.child;
 }
-
+// #17
 function updateClassComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -670,6 +673,7 @@ function updateClassComponent(
       // Since this is conceptually a new fiber, schedule a Placement effect
       workInProgress.effectTag |= Placement;
     }
+    // #17_1
     // In the initial pass we might need to construct the instance.
     constructClassInstance(
       workInProgress,
@@ -677,6 +681,7 @@ function updateClassComponent(
       nextProps,
       renderExpirationTime,
     );
+    // #17_2
     mountClassInstance(
       workInProgress,
       Component,
@@ -685,6 +690,7 @@ function updateClassComponent(
     );
     shouldUpdate = true;
   } else if (current === null) {
+    // #17_3
     // In a resume, we'll already have an instance we can reuse.
     shouldUpdate = resumeMountClassInstance(
       workInProgress,
@@ -701,6 +707,7 @@ function updateClassComponent(
       renderExpirationTime,
     );
   }
+  // #17_4
   const nextUnitOfWork = finishClassComponent(
     current,
     workInProgress,
@@ -723,7 +730,7 @@ function updateClassComponent(
   }
   return nextUnitOfWork;
 }
-
+// #17_4
 function finishClassComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -789,6 +796,7 @@ function finishClassComponent(
   // React DevTools reads this flag.
   workInProgress.effectTag |= PerformedWork;
   if (current !== null && didCaptureError) {
+    // #17_4_1
     // If we're recovering from an error, reconcile without reusing any of
     // the existing children. Conceptually, the normal children and the children
     // that are shown on error are two different sets, so we shouldn't reuse
@@ -1857,7 +1865,7 @@ function updateContextConsumer(
 export function markWorkInProgressReceivedUpdate() {
   didReceiveUpdate = true;
 }
-
+// #13_1
 function bailoutOnAlreadyFinishedWork(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1877,6 +1885,7 @@ function bailoutOnAlreadyFinishedWork(
 
   // Check if the children have any pending work.
   const childExpirationTime = workInProgress.childExpirationTime;
+  // 很大的优化
   if (childExpirationTime < renderExpirationTime) {
     // The children don't have any work either. We can skip them.
     // TODO: Once we add back resuming, we should check if the children are
@@ -1889,13 +1898,13 @@ function bailoutOnAlreadyFinishedWork(
     return workInProgress.child;
   }
 }
-
+// #13
 function beginWork(
   current: Fiber | null,
   workInProgress: Fiber,
   renderExpirationTime: ExpirationTime,
 ): Fiber | null {
-  const updateExpirationTime = workInProgress.expirationTime;
+  const updateExpirationTime = workInProgress.expirationTime; // 产生更新的过期时间
 
   if (current !== null) {
     const oldProps = current.memoizedProps;
@@ -1992,6 +2001,7 @@ function beginWork(
           }
         }
       }
+      // #13_1
       return bailoutOnAlreadyFinishedWork(
         current,
         workInProgress,
@@ -2025,6 +2035,7 @@ function beginWork(
         renderExpirationTime,
       );
     }
+
     case FunctionComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
@@ -2032,6 +2043,7 @@ function beginWork(
         workInProgress.elementType === Component
           ? unresolvedProps
           : resolveDefaultProps(Component, unresolvedProps);
+      // #14
       return updateFunctionComponent(
         current,
         workInProgress,
@@ -2047,6 +2059,7 @@ function beginWork(
         workInProgress.elementType === Component
           ? unresolvedProps
           : resolveDefaultProps(Component, unresolvedProps);
+      // #17
       return updateClassComponent(
         current,
         workInProgress,

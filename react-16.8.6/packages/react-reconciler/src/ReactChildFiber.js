@@ -232,12 +232,13 @@ function warnOnFunctionType() {
       'Or maybe you meant to call this function rather than return it.',
   );
 }
-
+// #15_1
 // This wrapper function exists because I expect to clone the code in each path
 // to be able to optimize each path individually by branching early. This needs
 // a compiler or we can do it manually. Helpers that don't need this branching
 // live outside of this function.
 function ChildReconciler(shouldTrackSideEffects) {
+  // #15_1_1_3_1
   function deleteChild(returnFiber: Fiber, childToDelete: Fiber): void {
     if (!shouldTrackSideEffects) {
       // Noop.
@@ -255,10 +256,11 @@ function ChildReconciler(shouldTrackSideEffects) {
     } else {
       returnFiber.firstEffect = returnFiber.lastEffect = childToDelete;
     }
+    // 副作用???
     childToDelete.nextEffect = null;
     childToDelete.effectTag = Deletion;
   }
-
+  // #15_1_1_3
   function deleteRemainingChildren(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -272,12 +274,14 @@ function ChildReconciler(shouldTrackSideEffects) {
     // assuming that after the first child we've already added everything.
     let childToDelete = currentFirstChild;
     while (childToDelete !== null) {
+      // #15_1_1_3_1
       deleteChild(returnFiber, childToDelete);
       childToDelete = childToDelete.sibling;
     }
     return null;
   }
 
+  // #16_3
   function mapRemainingChildren(
     returnFiber: Fiber,
     currentFirstChild: Fiber,
@@ -312,6 +316,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     return clone;
   }
 
+  // #16_2
   function placeChild(
     newFiber: Fiber,
     lastPlacedIndex: number,
@@ -517,7 +522,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     return null;
   }
-
+  // #16_1
   function updateSlot(
     returnFiber: Fiber,
     oldFiber: Fiber | null,
@@ -605,7 +610,8 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     return null;
   }
-
+  
+  // #16_4
   function updateFromMap(
     existingChildren: Map<string | number, Fiber>,
     returnFiber: Fiber,
@@ -729,7 +735,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
     return knownKeys;
   }
-
+  // #16
   function reconcileChildrenArray(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -778,6 +784,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       } else {
         nextOldFiber = oldFiber.sibling;
       }
+      // #16_1
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
@@ -801,6 +808,7 @@ function ChildReconciler(shouldTrackSideEffects) {
           deleteChild(returnFiber, oldFiber);
         }
       }
+      // #16_2
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
       if (previousNewFiber === null) {
         // TODO: Move out of the loop. This only happens for the first run.
@@ -846,11 +854,13 @@ function ChildReconciler(shouldTrackSideEffects) {
       return resultingFirstChild;
     }
 
+    // #16_3
     // Add all children to a key map for quick lookups.
     const existingChildren = mapRemainingChildren(returnFiber, oldFiber);
 
     // Keep scanning and use the map to restore deleted items as moves.
     for (; newIdx < newChildren.length; newIdx++) {
+      // #16_4
       const newFiber = updateFromMap(
         existingChildren,
         returnFiber,
@@ -1077,7 +1087,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     return resultingFirstChild;
   }
-
+  // #15_1_1_2
   function reconcileSingleTextNode(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1105,7 +1115,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     created.return = returnFiber;
     return created;
   }
-
+  // #15_1_1_1
   function reconcileSingleElement(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1213,6 +1223,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     return created;
   }
 
+  // #15_1_1
   // This API will tag the children with the side-effect of the reconciliation
   // itself. They will be added to the side-effect list as we pass through the
   // children and the parent.
@@ -1246,6 +1257,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE:
           return placeSingleChild(
+            // #15_1_1_1
             reconcileSingleElement(
               returnFiber,
               currentFirstChild,
@@ -1267,6 +1279,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     if (typeof newChild === 'string' || typeof newChild === 'number') {
       return placeSingleChild(
+        // #15_1_1_2
         reconcileSingleTextNode(
           returnFiber,
           currentFirstChild,
@@ -1277,6 +1290,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     if (isArray(newChild)) {
+      // #16
       return reconcileChildrenArray(
         returnFiber,
         currentFirstChild,
@@ -1333,6 +1347,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
+    // #15_1_1_3
     // Remaining cases are all treated as empty.
     return deleteRemainingChildren(returnFiber, currentFirstChild);
   }

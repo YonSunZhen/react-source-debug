@@ -413,7 +413,7 @@ function getStateFromUpdate<State>(
   }
   return prevState;
 }
-
+// #17_2_1
 export function processUpdateQueue<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
