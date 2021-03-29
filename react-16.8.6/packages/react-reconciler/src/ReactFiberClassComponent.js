@@ -238,7 +238,7 @@ const classComponentUpdater = {
     scheduleWork(fiber, expirationTime);
   },
 };
-
+// #17_3_1
 function checkShouldComponentUpdate(
   workInProgress,
   ctor,
@@ -949,6 +949,7 @@ function resumeMountClassInstance(
 
   const shouldUpdate =
     checkHasForceUpdateAfterProcessing() ||
+    // #17_3_1
     checkShouldComponentUpdate(
       workInProgress,
       ctor,

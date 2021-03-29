@@ -35,7 +35,7 @@ import {
   SimpleMemoComponent,
   LazyComponent,
   IncompleteClassComponent,
-} from 'shared/ReactWorkTags';
+} from '../../shared/ReactWorkTags';
 import {
   NoEffect,
   PerformedWork,
@@ -213,7 +213,7 @@ function forceUnmountCurrentAndReconcile(
     renderExpirationTime,
   );
 }
-
+// #21
 function updateForwardRef(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -307,7 +307,7 @@ function updateForwardRef(
   );
   return workInProgress.child;
 }
-
+// #23
 function updateMemoComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -319,6 +319,7 @@ function updateMemoComponent(
   if (current === null) {
     let type = Component.type;
     if (
+      // #23_1
       isSimpleFunctionComponent(type) &&
       Component.compare === null &&
       // SimpleMemoComponent codepath doesn't resolve outer props either.
@@ -332,6 +333,7 @@ function updateMemoComponent(
       if (__DEV__) {
         validateFunctionComponentInDev(workInProgress, type);
       }
+      // #23_2
       return updateSimpleMemoComponent(
         current,
         workInProgress,
@@ -411,7 +413,7 @@ function updateMemoComponent(
   workInProgress.child = newChild;
   return newChild;
 }
-
+// #23_2
 function updateSimpleMemoComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -451,6 +453,7 @@ function updateSimpleMemoComponent(
   if (current !== null) {
     const prevProps = current.memoizedProps;
     if (
+      // 对比新旧props和state有没有变化
       shallowEqual(prevProps, nextProps) &&
       current.ref === workInProgress.ref
     ) {
@@ -487,7 +490,7 @@ function updateFragment(
   );
   return workInProgress.child;
 }
-
+// #22
 function updateMode(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -842,7 +845,7 @@ function pushHostRootContext(workInProgress) {
   }
   pushHostContainer(workInProgress, root.containerInfo);
 }
-
+// #19
 function updateHostRoot(current, workInProgress, renderExpirationTime) {
   pushHostRootContext(workInProgress);
   const updateQueue = workInProgress.updateQueue;
@@ -915,7 +918,7 @@ function updateHostRoot(current, workInProgress, renderExpirationTime) {
   }
   return workInProgress.child;
 }
-
+// #20
 function updateHostComponent(current, workInProgress, renderExpirationTime) {
   pushHostContext(workInProgress);
 
@@ -928,6 +931,7 @@ function updateHostComponent(current, workInProgress, renderExpirationTime) {
   const prevProps = current !== null ? current.memoizedProps : null;
 
   let nextChildren = nextProps.children;
+  // #20_1
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
 
   if (isDirectTextChild) {
@@ -948,6 +952,7 @@ function updateHostComponent(current, workInProgress, renderExpirationTime) {
   if (
     renderExpirationTime !== Never &&
     workInProgress.mode & ConcurrentMode &&
+    // #20_2
     shouldDeprioritizeSubtree(type, nextProps)
   ) {
     // Schedule this fiber to re-render at offscreen priority. Then bailout.
@@ -1144,7 +1149,7 @@ function mountIncompleteClassComponent(
     renderExpirationTime,
   );
 }
-
+// #18
 function mountIndeterminateComponent(
   _current,
   workInProgress,
@@ -2018,6 +2023,7 @@ function beginWork(
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
       const elementType = workInProgress.elementType;
+      // #18
       return mountIndeterminateComponent(
         current,
         workInProgress,
@@ -2069,8 +2075,10 @@ function beginWork(
       );
     }
     case HostRoot:
+      // #19
       return updateHostRoot(current, workInProgress, renderExpirationTime);
     case HostComponent:
+      // #20
       return updateHostComponent(current, workInProgress, renderExpirationTime);
     case HostText:
       return updateHostText(current, workInProgress);
@@ -2093,6 +2101,7 @@ function beginWork(
         workInProgress.elementType === type
           ? unresolvedProps
           : resolveDefaultProps(type, unresolvedProps);
+      // #21
       return updateForwardRef(
         current,
         workInProgress,
@@ -2104,6 +2113,7 @@ function beginWork(
     case Fragment:
       return updateFragment(current, workInProgress, renderExpirationTime);
     case Mode:
+      // #22
       return updateMode(current, workInProgress, renderExpirationTime);
     case Profiler:
       return updateProfiler(current, workInProgress, renderExpirationTime);
@@ -2139,6 +2149,7 @@ function beginWork(
         }
       }
       resolvedProps = resolveDefaultProps(type.type, resolvedProps);
+      // #23
       return updateMemoComponent(
         current,
         workInProgress,

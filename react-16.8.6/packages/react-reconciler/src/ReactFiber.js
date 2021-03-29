@@ -323,7 +323,7 @@ function shouldConstruct(Component: Function) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
-
+// #23_1
 export function isSimpleFunctionComponent(type: any) {
   return (
     typeof type === 'function' &&
@@ -436,7 +436,7 @@ export function createHostRootFiber(isConcurrent: boolean): Fiber {
 
   return createFiber(HostRoot, null, null, mode);
 }
-
+// #22_1_1
 export function createFiberFromTypeAndProps(
   type: any, // React$ElementType
   key: null | string,
@@ -542,7 +542,7 @@ export function createFiberFromTypeAndProps(
 
   return fiber;
 }
-
+// #22_1
 export function createFiberFromElement(
   element: ReactElement,
   mode: TypeOfMode,
@@ -555,6 +555,7 @@ export function createFiberFromElement(
   const type = element.type;
   const key = element.key;
   const pendingProps = element.props;
+  // #22_1_1
   const fiber = createFiberFromTypeAndProps(
     type,
     key,

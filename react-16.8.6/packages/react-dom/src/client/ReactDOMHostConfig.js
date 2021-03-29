@@ -263,7 +263,7 @@ export function prepareUpdate(
     rootContainerInstance,
   );
 }
-
+// #20_1
 export function shouldSetTextContent(type: string, props: Props): boolean {
   return (
     type === 'textarea' ||
@@ -276,7 +276,7 @@ export function shouldSetTextContent(type: string, props: Props): boolean {
       props.dangerouslySetInnerHTML.__html != null)
   );
 }
-
+// #20_2
 export function shouldDeprioritizeSubtree(type: string, props: Props): boolean {
   return !!props.hidden;
 }

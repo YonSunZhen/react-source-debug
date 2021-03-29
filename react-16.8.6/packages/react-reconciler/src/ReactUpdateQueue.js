@@ -323,7 +323,7 @@ export function enqueueCapturedUpdate<State>(
     workInProgressQueue.lastCapturedUpdate = update;
   }
 }
-
+// #17_2_1_1
 function ensureWorkInProgressQueueIsAClone<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
@@ -338,7 +338,7 @@ function ensureWorkInProgressQueueIsAClone<State>(
   }
   return queue;
 }
-
+// #17_2_1_2
 function getStateFromUpdate<State>(
   workInProgress: Fiber,
   queue: UpdateQueue<State>,
@@ -422,7 +422,7 @@ export function processUpdateQueue<State>(
   renderExpirationTime: ExpirationTime,
 ): void {
   hasForceUpdate = false;
-
+  // #17_2_1_1
   queue = ensureWorkInProgressQueueIsAClone(workInProgress, queue);
 
   if (__DEV__) {
@@ -455,6 +455,7 @@ export function processUpdateQueue<State>(
         newExpirationTime = updateExpirationTime;
       }
     } else {
+      // #17_2_1_2
       // This update does have sufficient priority. Process it and compute
       // a new result.
       resultState = getStateFromUpdate(
